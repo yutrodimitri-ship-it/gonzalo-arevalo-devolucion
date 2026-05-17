@@ -1,0 +1,30 @@
+# Videos grandes
+*.mp4
+*.mov
+*.mxf
+*.zip
+
+# LUTs
+*.lut
+*.lut.CUBE
+*.cube
+
+# Scripts Python
+shot_classifier/
+shot_analysis/*.csv
+shot_analysis/*.txt
+shot_analysis/*.json
+shot_analysis/scenes/
+
+# Carpetas internas
+Reel interno/
+Salida correcion de color final/
+Video Correcion de color auto/
+dashboard/
+Proxy archivos/
+
+# Misc
+.claude/
+.firecrawl/
+.playwright-mcp/
+*.md

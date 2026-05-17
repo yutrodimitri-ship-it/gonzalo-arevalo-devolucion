@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Changan — Informe de Corrección de Color | Gonzalo Arevalo</title>
+<style>
+  :root {
+    --gold: #C8922A;
+    --gold-light: #E8B84B;
+    --gold-dim: #7a5a1a;
+    --black: #000000;
+    --dark: #0a0a0a;
+    --dark2: #111111;
+    --dark3: #1a1a1a;
+    --white: #ffffff;
+    --gray: #888888;
+    --gray-light: #cccccc;
+    --selected: #E8B84B33;
+    --selected-border: #E8B84B;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--black); color:var(--white); font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; line-height:1.6; }
+
+  /* PAGES */
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* HEADER */
+  header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 60px 16px; border-bottom:1px solid var(--gold-dim);
+    background:var(--black); position:sticky; top:0; z-index:100;
+  }
+  .logo-wrap {
+    width:220px; height:120px; overflow:hidden; position:relative;
+  }
+  .logo-wrap img {
+    position:absolute; width:420px; height:auto;
+    top:58%; left:50%; transform:translate(-50%, -50%);
+    display:block;
+  }
+  nav { display:flex; gap:36px; align-items:center; }
+  nav a { color:var(--gray); text-decoration:none; font-size:12px; letter-spacing:2px; text-transform:uppercase; transition:color 0.2s; cursor:pointer; }
+  nav a:hover { color:var(--gold-light); }
+  .nav-review-btn {
+    background:var(--dark3); color:var(--gray); border:1px solid #333;
+    padding:10px 22px; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    cursor:pointer; font-weight:700; border-radius:2px; transition:all 0.2s;
+  }
+  .nav-review-btn:hover { border-color:var(--gold-dim); color:var(--gold); }
+  .nav-review-btn.has-selection { background:var(--gold); color:var(--black); border-color:var(--gold); }
+  .nav-review-btn.has-selection:hover { background:var(--gold-light); }
+
+  /* HERO */
+  .hero { padding:100px 60px 80px; max-width:1400px; margin:0 auto; }
+  .hero-tag { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:20px; }
+  .hero h1 { font-size:clamp(42px,6vw,80px); font-weight:300; letter-spacing:-1px; line-height:1.05; margin-bottom:24px; }
+  .hero h1 span { color:var(--gold-light); font-weight:700; }
+  .hero-desc { max-width:600px; color:var(--gray); font-size:16px; line-height:1.8; margin-bottom:60px; }
+  .stats-row { display:flex; gap:60px; padding-top:40px; border-top:1px solid #222; }
+  .stat-num { font-size:48px; font-weight:700; color:var(--gold-light); line-height:1; }
+  .stat-label { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--gray); margin-top:6px; }
+
+  /* PROCESS */
+  .process-section { background:var(--dark2); padding:80px 60px; border-top:1px solid #222; border-bottom:1px solid #222; }
+  .section-header { max-width:1400px; margin:0 auto 50px; }
+  .section-tag { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+  .section-header h2 { font-size:32px; font-weight:300; }
+  .process-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; max-width:1400px; margin:0 auto; }
+  .process-card { background:var(--dark3); padding:36px 28px; border-left:2px solid transparent; transition:border-color 0.2s; }
+  .process-card:hover { border-color:var(--gold); }
+  .process-num { font-size:48px; font-weight:700; color:var(--gold-dim); line-height:1; margin-bottom:20px; }
+  .process-card h3 { font-size:15px; font-weight:600; letter-spacing:1px; margin-bottom:12px; }
+  .process-card p { font-size:13px; color:var(--gray); line-height:1.7; }
+  .process-card .tag-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; }
+  .tag { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; padding:4px 10px; border:1px solid var(--gold-dim); color:var(--gold); border-radius:2px; }
+
+  /* TIMELINE SECTIONS */
+  .timeline-section { padding:80px 60px; max-width:1400px; margin:0 auto; }
+  .tl-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:40px; padding-bottom:24px; border-bottom:1px solid #222; }
+  .tl-type-badge { display:inline-block; font-size:10px; letter-spacing:3px; text-transform:uppercase; padding:5px 14px; border:1px solid var(--gold); color:var(--gold); margin-bottom:14px; border-radius:2px; }
+  .tl-header h2 { font-size:36px; font-weight:300; }
+  .tl-header h2 strong { font-weight:700; }
+  .tl-clip-count { font-size:13px; color:var(--gray); letter-spacing:1px; }
+
+  /* SELECT MODE TOOLBAR */
+  .select-toolbar {
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--dark3); border:1px solid #333; padding:14px 20px;
+    margin-bottom:20px; border-radius:2px;
+  }
+  .select-toolbar-left { font-size:13px; color:var(--gray); }
+  .select-toolbar-left strong { color:var(--white); }
+  .select-toolbar-right { display:flex; gap:10px; }
+  .btn-sm {
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase; padding:8px 18px;
+    cursor:pointer; border-radius:2px; border:none; transition:all 0.2s;
+  }
+  .btn-outline { background:transparent; border:1px solid #444; color:var(--gray); }
+  .btn-outline:hover { border-color:var(--gold); color:var(--gold); }
+  .btn-gold { background:var(--gold); color:var(--black); font-weight:700; }
+  .btn-gold:hover { background:var(--gold-light); }
+  .btn-gold:disabled { background:#555; color:#888; cursor:not-allowed; }
+
+  /* DESCRIPTION CARD */
+  .description-card { background:var(--dark3); border-left:3px solid var(--gold); padding:28px 32px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:32px; }
+  .desc-block h4 { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .desc-block p, .desc-block ul { font-size:13px; color:var(--gray-light); line-height:1.7; }
+  .desc-block ul { list-style:none; }
+  .desc-block ul li::before { content:"— "; color:var(--gold-dim); }
+
+  /* SHOT GRID */
+  .shot-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:3px; }
+
+  .shot-item {
+    position:relative; aspect-ratio:16/9; overflow:hidden;
+    cursor:pointer; background:var(--dark3); border:2px solid transparent;
+    transition:border-color 0.2s;
+  }
+  .shot-item:hover { border-color:#444; }
+  .shot-item.selected { border-color:var(--selected-border); }
+  .shot-item.selected::after {
+    content:'✓'; position:absolute; top:8px; right:8px;
+    background:var(--gold); color:var(--black); width:22px; height:22px;
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:900; z-index:2; line-height:22px; text-align:center;
+  }
+  .shot-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease,filter 0.4s ease; filter:brightness(0.9); }
+  .shot-item:hover img { transform:scale(1.04); filter:brightness(1.1); }
+  .shot-item.selected img { filter:brightness(1.05); }
+  .shot-overlay { position:absolute; bottom:0; left:0; right:0; padding:12px 14px 10px; background:linear-gradient(transparent,rgba(0,0,0,0.85)); opacity:0; transition:opacity 0.3s; }
+  .shot-item:hover .shot-overlay, .shot-item.selected .shot-overlay { opacity:1; }
+  .shot-id { font-size:10px; letter-spacing:2px; color:var(--gold-light); }
+
+  /* FLOATING SELECTION BAR */
+  #float-bar {
+    position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:var(--dark3); border:1px solid var(--gold-dim); padding:16px 28px;
+    display:flex; align-items:center; gap:24px; z-index:200;
+    transition:transform 0.3s ease; border-radius:4px; white-space:nowrap;
+    box-shadow:0 8px 40px rgba(0,0,0,0.8);
+  }
+  #float-bar.show { transform:translateX(-50%) translateY(0); }
+  #float-bar-count { font-size:13px; color:var(--gold-light); font-weight:700; }
+  #float-bar-label { font-size:12px; color:var(--gray); }
+
+  /* DIVIDER */
+  .divider { height:1px; background:linear-gradient(to right,transparent,var(--gold-dim),transparent); margin:0 60px; }
+
+  /* FOOTER */
+  footer { padding:60px; border-top:1px solid #222; display:flex; align-items:center; justify-content:space-between; max-width:1400px; margin:0 auto; }
+  .footer-logo img { height:80px; }
+  .footer-info { text-align:right; font-size:12px; color:var(--gray); line-height:1.8; }
+  .footer-info strong { color:var(--gold-light); }
+
+  /* ==================== REVIEW PAGE ==================== */
+  #page-review { background:var(--black); min-height:100vh; }
+
+  .review-header {
+    padding:28px 60px; border-bottom:1px solid var(--gold-dim);
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--black); position:sticky; top:0; z-index:100;
+  }
+  .review-header h2 { font-size:20px; font-weight:300; }
+  .review-header h2 strong { color:var(--gold-light); }
+  .review-actions { display:flex; gap:12px; }
+
+  .review-hero { padding:60px 60px 40px; max-width:1400px; margin:0 auto; border-bottom:1px solid #222; margin-bottom:40px; }
+  .review-hero p { color:var(--gray); font-size:14px; max-width:500px; }
+
+  .review-grid {
+    max-width:1400px; margin:0 auto; padding:0 60px 80px;
+    display:flex; flex-direction:column; gap:24px;
+  }
+
+  .review-card {
+    background:var(--dark3); border:1px solid #2a2a2a;
+    display:flex; flex-direction:row;
+    overflow:hidden; border-radius:2px; transition:border-color 0.2s;
+  }
+  .review-card:hover { border-color:#444; }
+
+  .review-card-img {
+    position:relative; width:280px; min-width:280px; flex-shrink:0;
+    overflow:hidden; min-height:158px;
+  }
+  .review-card-img img { width:100%; height:100%; object-fit:cover; display:block; }
+  .review-card-badge {
+    position:absolute; top:10px; left:10px;
+    font-size:9px; letter-spacing:2px; text-transform:uppercase;
+    padding:4px 10px; background:var(--gold); color:var(--black); font-weight:700;
+    border-radius:2px;
+  }
+  .review-card-shotnum {
+    position:absolute; bottom:8px; left:10px;
+    font-size:10px; letter-spacing:1px; color:rgba(255,255,255,0.7);
+  }
+
+  .review-card-body { flex:1; min-width:0; padding:20px 24px; display:flex; flex-direction:column; gap:12px; }
+  .review-card-title { font-size:15px; font-weight:600; letter-spacing:0.5px; }
+  .review-card-title span { color:var(--gold); }
+
+  .review-status-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .status-btn {
+    font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    padding:6px 14px; border-radius:2px; cursor:pointer; border:1px solid #444;
+    background:transparent; color:var(--gray); transition:all 0.15s;
+  }
+  .status-btn:hover { border-color:var(--gold-dim); color:var(--gold); }
+  .status-btn.active-aprobado { border-color:#4caf50; background:#4caf5022; color:#4caf50; }
+  .status-btn.active-revisar  { border-color:#ff9800; background:#ff980022; color:#ff9800; }
+  .status-btn.active-rechazar { border-color:#f44336; background:#f4433622; color:#f44336; }
+
+  .review-comment { width:100%; background:var(--dark2); border:1px solid #333; color:var(--white); padding:10px 16px; font-size:13px; line-height:1.6; resize:vertical; min-height:44px; max-height:120px; border-radius:2px; font-family:inherit; transition:border-color 0.2s; }
+  .review-comment:focus { outline:none; border-color:var(--gold-dim); }
+  .review-comment::placeholder { color:#555; }
+
+  .review-card-footer { display:flex; align-items:center; justify-content:space-between; margin-top:4px; }
+  .save-indicator { font-size:11px; color:#555; letter-spacing:1px; transition:color 0.3s; }
+  .save-indicator.saved { color:#4caf50; }
+
+  .export-section {
+    max-width:1400px; margin:0 auto; padding:0 60px 60px;
+    border-top:1px solid #222; padding-top:40px;
+    display:flex; justify-content:flex-end; gap:12px;
+  }
+
+  /* LIGHTBOX */
+  .lightbox { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.96); z-index:999; align-items:center; justify-content:center; flex-direction:column; }
+  .lightbox.active { display:flex; }
+  .lightbox img { max-width:90vw; max-height:80vh; object-fit:contain; border:1px solid var(--gold-dim); }
+  .lightbox-close { position:absolute; top:24px; right:32px; font-size:28px; color:var(--gray); cursor:pointer; background:none; border:none; line-height:1; }
+  .lightbox-close:hover { color:var(--gold); }
+  .lightbox-caption { margin-top:16px; font-size:12px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; }
+
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:var(--black); }
+  ::-webkit-scrollbar-thumb { background:var(--gold-dim); }
+
+  /* CONFIRM MODAL */
+  .confirm-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.88);
+    z-index:600; align-items:center; justify-content:center;
+  }
+  .confirm-overlay.active { display:flex; }
+  .confirm-box {
+    background:var(--dark3); border:1px solid var(--gold-dim);
+    padding:44px 52px; max-width:460px; width:90%; position:relative;
+    border-radius:4px; text-align:center;
+  }
+  .confirm-box-tag { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:14px; }
+  .confirm-box-title { font-size:22px; font-weight:300; margin-bottom:12px; }
+  .confirm-box-desc { font-size:13px; color:var(--gray); margin-bottom:36px; line-height:1.7; }
+  .confirm-box-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .confirm-close {
+    position:absolute; top:14px; right:18px; background:none; border:none;
+    color:var(--gray); font-size:24px; cursor:pointer; line-height:1; padding:4px;
+  }
+  .confirm-close:hover { color:var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE MAIN ============ -->
+<div class="page active" id="page-main">
+
+<header>
+  <div class="logo-wrap">
+    <img src="assets/logoGA.jpg" alt="Gonzalo Arevalo">
+  </div>
+  <nav>
+    <a onclick="scrollToSection('#proceso')">Proceso</a>
+    <a onclick="scrollToSection('#carretera')">Carretera</a>
+    <a onclick="scrollToSection('#ciudad')">Ciudad</a>
+    <a onclick="scrollToSection('#interior')">Interior</a>
+    <button class="nav-review-btn" id="nav-review-btn" onclick="goToReview()">
+      Revisar selección · <span id="nav-count">0</span> clips
+    </button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Informe de Corrección de Color · 2026</div>
+  <h1>Changan<br><span>Color Grade</span></h1>
+  <p class="hero-desc">
+    Documentación técnica del proceso de corrección de color aplicado al proyecto Changan.
+    El grade fue desarrollado a partir de la referencia aprobada op1v2.
+    Selecciona los clips que necesiten revisión y deja comentarios por clip.
+  </p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">115</div><div class="stat-label">Clips totales</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">Timelines</div></div>
+    <div class="stat"><div class="stat-num">50</div><div class="stat-label">FPS</div></div>
+    <div class="stat"><div class="stat-num">6K</div><div class="stat-label">Resolución</div></div>
+  </div>
+</section>
+
+<!-- PROCESO -->
+<section class="process-section" id="proceso">
+  <div class="section-header">
+    <div class="section-tag">Pipeline técnico</div>
+    <h2>Estructura de nodos aplicada</h2>
+  </div>
+  <div class="process-grid">
+    <div class="process-card">
+      <div class="process-num">01</div>
+      <h3>LUT Técnico</h3>
+      <p>Conversión de espacio de color ARRI Alexa LogC a Rec.709. Aplicado en Pre-Clip del grupo para afectar todos los clips simultáneamente.</p>
+      <div class="tag-list"><span class="tag">Pre-Clip Group</span><span class="tag">ARRI LogC → Rec709</span></div>
+    </div>
+    <div class="process-card">
+      <div class="process-num">02</div>
+      <h3>Base Global</h3>
+      <p>Contraste 1.40 / Pivot 0.45 / Lift +0.02. Equivalente al Brillo +8 / Contraste +54 del PSD de referencia.</p>
+      <div class="tag-list"><span class="tag">Post-Clip Node 01</span><span class="tag">Contrast 1.40</span></div>
+    </div>
+    <div class="process-card">
+      <div class="process-num">03</div>
+      <h3>Color Global</h3>
+      <p>Temperatura −15 (filtro cián 25%). Saturación 72 equivalente al Tono/Sat +43 del PSD. Midtones y sombras ajustados por canal.</p>
+      <div class="tag-list"><span class="tag">Post-Clip Node 02</span><span class="tag">Temp −15</span><span class="tag">Sat 72</span></div>
+    </div>
+    <div class="process-card">
+      <div class="process-num">04</div>
+      <h3>Corrección de Azules</h3>
+      <p>Corrección selectiva del rango de azules via Hue vs Sat y Hue vs Hue. Equivalente a Cian −23 / Magenta −23 / Amarillo +39 del PSD.</p>
+      <div class="tag-list"><span class="tag">Post-Clip Node 04</span><span class="tag">Hue vs Sat</span><span class="tag">Hue vs Hue</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CARRETERA -->
+<section class="timeline-section" id="carretera">
+  <div class="tl-header">
+    <div class="tl-header-left">
+      <div class="tl-type-badge">Exterior · Ruta</div>
+      <h2><strong>Carretera</strong> Shots</h2>
+    </div>
+    <div class="tl-clip-count">38 clips · CARRETERA_Shots</div>
+  </div>
+  <div class="description-card">
+    <div class="desc-block">
+      <h4>Contexto visual</h4>
+      <p>Tomas exteriores en carretera de montaña, cielo abierto y luz natural directa. Predomina el cielo como fondo con horizonte de montaña.</p>
+    </div>
+    <div class="desc-block">
+      <h4>Correcciones aplicadas</h4>
+      <ul><li>LUT ARRI LogC → Rec.709</li><li>Contraste 1.40 / Pivot 0.45</li><li>Temperatura −15 (filtro cián)</li><li>Saturación 72</li><li>Azules: desaturación + rotación hue</li><li>Correcciones Gain por clip individual</li></ul>
+    </div>
+    <div class="desc-block">
+      <h4>Look final</h4>
+      <p>Cinematográfico frío-neutro con alto contraste. Cielos con tratamiento especial. Sombras con densidad intencional hacia azul. Referencia: op1v2.</p>
+    </div>
+  </div>
+  <div class="select-toolbar">
+    <div class="select-toolbar-left">Haz clic en los frames para <strong>seleccionar clips con ajustes</strong> a revisar</div>
+    <div class="select-toolbar-right">
+      <button class="btn-sm btn-outline" onclick="selectAll('CARRETERA')">Seleccionar todos</button>
+      <button class="btn-sm btn-outline" onclick="clearAll('CARRETERA')">Limpiar</button>
+    </div>
+  </div>
+  <div class="shot-grid" id="grid-carretera"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CIUDAD -->
+<section class="timeline-section" id="ciudad">
+  <div class="tl-header">
+    <div class="tl-header-left">
+      <div class="tl-type-badge">Exterior · Urbano</div>
+      <h2><strong>Ciudad</strong> Shots</h2>
+    </div>
+    <div class="tl-clip-count">57 clips · CIUDAD_Shots</div>
+  </div>
+  <div class="description-card">
+    <div class="desc-block">
+      <h4>Contexto visual</h4>
+      <p>Tomas exteriores en entorno urbano: calles, edificios, infraestructura vial. Mezcla de luz natural y artificial.</p>
+    </div>
+    <div class="desc-block">
+      <h4>Correcciones aplicadas</h4>
+      <ul><li>Base group idéntica a Carretera</li><li>Control highlights en superficies urbanas</li><li>Balance R/G/B ajustado por clip</li><li>Niveles via Custom Curves por clip</li></ul>
+    </div>
+    <div class="desc-block">
+      <h4>Look final</h4>
+      <p>Consistencia con look de carretera. Tonos urbanos neutralizados. Highlights controlados para preservar detalle en reflejos.</p>
+    </div>
+  </div>
+  <div class="select-toolbar">
+    <div class="select-toolbar-left">Haz clic en los frames para <strong>seleccionar clips con ajustes</strong> a revisar</div>
+    <div class="select-toolbar-right">
+      <button class="btn-sm btn-outline" onclick="selectAll('CIUDAD')">Seleccionar todos</button>
+      <button class="btn-sm btn-outline" onclick="clearAll('CIUDAD')">Limpiar</button>
+    </div>
+  </div>
+  <div class="shot-grid" id="grid-ciudad"></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- INTERIOR -->
+<section class="timeline-section" id="interior">
+  <div class="tl-header">
+    <div class="tl-header-left">
+      <div class="tl-type-badge">Interior · Cabina</div>
+      <h2><strong>Interior</strong> Shots</h2>
+    </div>
+    <div class="tl-clip-count">20 clips · INTERIOR_Shots</div>
+  </div>
+  <div class="description-card">
+    <div class="desc-block">
+      <h4>Contexto visual</h4>
+      <p>Tomas interiores de cabina: tablero, volante, pantallas y detalles del habitáculo. Iluminación mixta con LEDs del panel y luz exterior.</p>
+    </div>
+    <div class="desc-block">
+      <h4>Correcciones aplicadas</h4>
+      <ul><li>Base group con LUT ARRI</li><li>Balance de blancos adaptado a cabina</li><li>Detalle preservado en pantallas</li><li>Sombras levantadas para visibilidad</li></ul>
+    </div>
+    <div class="desc-block">
+      <h4>Look final</h4>
+      <p>Look premium de cabina. Pantallas correctamente expuestas. Coherencia cromática con tomas exteriores.</p>
+    </div>
+  </div>
+  <div class="select-toolbar">
+    <div class="select-toolbar-left">Haz clic en los frames para <strong>seleccionar clips con ajustes</strong> a revisar</div>
+    <div class="select-toolbar-right">
+      <button class="btn-sm btn-outline" onclick="selectAll('INTERIOR')">Seleccionar todos</button>
+      <button class="btn-sm btn-outline" onclick="clearAll('INTERIOR')">Limpiar</button>
+    </div>
+  </div>
+  <div class="shot-grid" id="grid-interior"></div>
+</section>
+
+<footer>
+  <div class="footer-logo"><img src="assets/logoGA.jpg" alt="Gonzalo Arevalo"></div>
+  <div class="footer-info">
+    <div><strong>Proyecto:</strong> Changan — Corrección de Color</div>
+    <div><strong>Software:</strong> DaVinci Resolve Studio 21</div>
+    <div><strong>Colorista:</strong> Gonzalo Arevalo · CGI / IA / Retoque</div>
+    <div style="margin-top:8px;color:#555">© 2026 Gonzalo Arevalo. Documento confidencial para cliente.</div>
+  </div>
+</footer>
+
+<!-- FLOAT BAR -->
+<div id="float-bar">
+  <span id="float-bar-count" class="stat-num" style="font-size:22px">0</span>
+  <span id="float-bar-label" class="save-indicator" style="font-size:13px;color:var(--gray)">clips seleccionados</span>
+  <button class="btn-sm btn-gold" onclick="goToReview()">Ver y comentar →</button>
+  <button class="btn-sm btn-outline" onclick="clearAllSelected()">Limpiar todo</button>
+</div>
+
+</div><!-- end page-main -->
+
+
+<!-- ============ PAGE REVIEW ============ -->
+<div class="page" id="page-review">
+
+<div class="review-header">
+  <div>
+    <div class="hero-tag" style="margin:0 0 4px">Revisión de clips</div>
+    <h2>Selección: <strong id="review-title-count">0 clips</strong></h2>
+  </div>
+  <div class="review-actions">
+    <button class="btn-sm btn-outline" onclick="goToMain()">← Volver al informe</button>
+    <button class="btn-sm btn-gold" onclick="exportComments()">Exportar comentarios</button>
+  </div>
+</div>
+
+<div class="review-hero">
+  <div class="section-tag">Instrucciones</div>
+  <p>Por cada clip seleccionado puedes marcar su estado (Aprobado / Revisar / Rechazar) y dejar un comentario específico. Los comentarios se guardan automáticamente en tu navegador.</p>
+</div>
+
+<div class="review-grid" id="review-grid"></div>
+
+<div class="export-section">
+  <button class="btn-sm btn-outline" onclick="clearAllComments()">Limpiar todos los comentarios</button>
+  <button class="btn-sm btn-gold" onclick="exportComments()">Exportar como texto</button>
+</div>
+
+</div><!-- end page-review -->
+
+
+<!-- CONFIRM MODAL -->
+<div class="confirm-overlay" id="confirm-modal">
+  <div class="confirm-box">
+    <button class="confirm-close" onclick="closeConfirmModal()">×</button>
+    <div class="confirm-box-tag">Confirmar acción</div>
+    <div class="confirm-box-title">Limpiar comentarios</div>
+    <div class="confirm-box-desc" id="confirm-desc"></div>
+    <div class="confirm-box-actions">
+      <button class="btn-sm btn-outline" id="btn-clear-this" onclick="confirmClearThis()">Limpiar este clip</button>
+      <button class="btn-sm btn-gold" onclick="confirmClearAll()">Limpiar todo</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="">
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+
+
+<script>
+const SHOTS = {
+  CARRETERA: [60,8,9,11,12,13,14,15,16,18,19,23,48,52,53,56,62,72,73,84,85,86,7,10,17,21,46,47,49,51,54,57,58,59,63,87,22,50],
+  CIUDAD:    [3,5,1,2,4,6,69,74,75,77,78,79,82,83,55,90,91,92,93,95,65,66,67,68,76,80,81,88,89,94,98,99,100,102,104,105,106,107,30,31,33,34,35,24,25,26,29,32,36,64,27,28,96,97,101,103,121],
+  INTERIOR:  [41,43,44,45,108,110,111,113,117,120,38,39,40,118,119,109,112,114,115,116]
+};
+
+const selected = new Set();
+
+function pad(n) { return String(n).padStart(4,'0'); }
+function pad3(n) { return String(n).padStart(3,'0'); }
+function shotSrc(id) { return `shot_analysis/thumbs/shot_${pad(id)}.jpg`; }
+
+// Build main grids
+function buildGrid(ids, containerId, type) {
+  const container = document.getElementById(containerId);
+  ids.forEach(id => {
+    const key = `${type}_${id}`;
+    const item = document.createElement('div');
+    item.className = 'shot-item';
+    item.id = `shot-item-${key}`;
+    item.innerHTML = `
+      <img src="${shotSrc(id)}" alt="Shot ${id}" loading="lazy">
+      <div class="shot-overlay"><div class="shot-id">${type} · SHOT ${pad3(id)}</div></div>`;
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSelect(key, item);
+    });
+    item.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      openLightbox(shotSrc(id), `${type} · Shot ${pad3(id)}`);
+    });
+    container.appendChild(item);
+  });
+}
+
+buildGrid(SHOTS.CARRETERA, 'grid-carretera', 'CARRETERA');
+buildGrid(SHOTS.CIUDAD,    'grid-ciudad',    'CIUDAD');
+buildGrid(SHOTS.INTERIOR,  'grid-interior',  'INTERIOR');
+
+function toggleSelect(key, el) {
+  if (selected.has(key)) {
+    selected.delete(key);
+    el.classList.remove('selected');
+  } else {
+    selected.add(key);
+    el.classList.add('selected');
+  }
+  updateFloatBar();
+}
+
+function updateFloatBar() {
+  const count = selected.size;
+  document.getElementById('float-bar-count').textContent = count;
+  document.getElementById('nav-count').textContent = count;
+  const bar = document.getElementById('float-bar');
+  const btn = document.getElementById('nav-review-btn');
+  if (count > 0) {
+    bar.classList.add('show');
+    btn.classList.add('has-selection');
+  } else {
+    bar.classList.remove('show');
+    btn.classList.remove('has-selection');
+  }
+}
+
+function goToReview() {
+  if (selected.size === 0) {
+    if (confirm('No has seleccionado ningún clip.\n\n¿Querés ver todos los 121 clips en la revisión?')) {
+      selectAll('CARRETERA');
+      selectAll('CIUDAD');
+      selectAll('INTERIOR');
+    } else {
+      return;
+    }
+  }
+  buildReviewGrid();
+  document.getElementById('page-main').classList.remove('active');
+  document.getElementById('page-review').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function selectAll(type) {
+  SHOTS[type].forEach(id => {
+    const key = `${type}_${id}`;
+    selected.add(key);
+    const el = document.getElementById(`shot-item-${key}`);
+    if (el) el.classList.add('selected');
+  });
+  updateFloatBar();
+}
+
+function clearAll(type) {
+  SHOTS[type].forEach(id => {
+    const key = `${type}_${id}`;
+    selected.delete(key);
+    const el = document.getElementById(`shot-item-${key}`);
+    if (el) el.classList.remove('selected');
+  });
+  updateFloatBar();
+}
+
+function clearAllSelected() {
+  selected.forEach(key => {
+    const el = document.getElementById(`shot-item-${key}`);
+    if (el) el.classList.remove('selected');
+  });
+  selected.clear();
+  updateFloatBar();
+}
+
+// ---- REVIEW PAGE ----
+function goToMain() {
+  document.getElementById('page-review').classList.remove('active');
+  document.getElementById('page-main').classList.add('active');
+}
+
+function buildReviewGrid() {
+  const grid = document.getElementById('review-grid');
+  grid.innerHTML = '';
+  document.getElementById('review-title-count').textContent = `${selected.size} clips`;
+
+  const sorted = [...selected].sort((a,b) => {
+    const [ta,ia] = a.split('_'); const [tb,ib] = b.split('_');
+    if (ta !== tb) return ta.localeCompare(tb);
+    return parseInt(ia) - parseInt(ib);
+  });
+
+  sorted.forEach(key => {
+    const [type, idStr] = key.split('_');
+    const id = parseInt(idStr);
+    const saved = JSON.parse(localStorage.getItem(`review_${key}`) || '{}');
+
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    card.innerHTML = `
+      <div class="review-card-img">
+        <img src="${shotSrc(id)}" alt="Shot ${id}" loading="lazy">
+        <div class="review-card-badge">${type}</div>
+        <div class="review-card-shotnum">SHOT ${pad3(id)}</div>
+      </div>
+      <div class="review-card-body">
+        <div class="review-card-title">${type} · <span>Shot ${pad3(id)}</span></div>
+        <textarea class="review-comment" placeholder="Escribe tu comentario para este clip... (ej: ajustar highlights, el cielo está quemado, etc.)" id="comment-${key}" onInput="saveComment('${key}')">${saved.comment||''}</textarea>
+        <div class="review-card-footer">
+          <span class="save-indicator" id="saved-${key}">${saved.comment?'Guardado':'Escribe para guardar'}</span>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function setStatus(key, btn, status) {
+  const saved = JSON.parse(localStorage.getItem(`review_${key}`) || '{}');
+  if (saved.status === status) {
+    saved.status = null;
+  } else {
+    saved.status = status;
+  }
+  localStorage.setItem(`review_${key}`, JSON.stringify(saved));
+  // Update buttons
+  const row = btn.closest('.review-status-row');
+  row.querySelectorAll('.status-btn').forEach(b => {
+    b.className = 'status-btn';
+    if (b.dataset.status === saved.status) {
+      b.classList.add(`active-${saved.status}`);
+    }
+  });
+}
+
+let saveTimers = {};
+function saveComment(key) {
+  clearTimeout(saveTimers[key]);
+  const el = document.getElementById(`saved-${key}`);
+  if (el) { el.textContent = 'Guardando...'; el.classList.remove('saved'); }
+  saveTimers[key] = setTimeout(() => {
+    const saved = JSON.parse(localStorage.getItem(`review_${key}`) || '{}');
+    saved.comment = document.getElementById(`comment-${key}`).value;
+    localStorage.setItem(`review_${key}`, JSON.stringify(saved));
+    if (el) { el.textContent = 'Guardado ✓'; el.classList.add('saved'); }
+  }, 800);
+}
+
+let activeCommentKey = null;
+
+document.addEventListener('focusin', e => {
+  if (e.target.classList.contains('review-comment')) {
+    const m = e.target.id.match(/^comment-(.+)$/);
+    if (m) activeCommentKey = m[1];
+  }
+});
+
+function clearAllComments() {
+  showClearModal();
+}
+
+function showClearModal() {
+  const btnThis = document.getElementById('btn-clear-this');
+  const desc = document.getElementById('confirm-desc');
+  if (activeCommentKey) {
+    const parts = activeCommentKey.split('_');
+    const type = parts[0];
+    const id = parseInt(parts[1]);
+    desc.textContent = `Podés limpiar solo el comentario del clip activo (${type} · Shot ${pad3(id)}) o borrar todos los comentarios de la revisión.`;
+    btnThis.style.display = '';
+  } else {
+    desc.textContent = 'Esto borrará todos los comentarios guardados en esta revisión. Esta acción no se puede deshacer.';
+    btnThis.style.display = 'none';
+  }
+  document.getElementById('confirm-modal').classList.add('active');
+}
+
+function closeConfirmModal() {
+  document.getElementById('confirm-modal').classList.remove('active');
+}
+
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfirmModal();
+});
+
+function confirmClearThis() {
+  if (!activeCommentKey) return;
+  localStorage.removeItem(`review_${activeCommentKey}`);
+  const ta = document.getElementById(`comment-${activeCommentKey}`);
+  if (ta) ta.value = '';
+  const si = document.getElementById(`saved-${activeCommentKey}`);
+  if (si) { si.textContent = 'Escribe para guardar'; si.classList.remove('saved'); }
+  closeConfirmModal();
+}
+
+function confirmClearAll() {
+  selected.forEach(key => localStorage.removeItem(`review_${key}`));
+  activeCommentKey = null;
+  buildReviewGrid();
+  closeConfirmModal();
+}
+
+function exportComments() {
+  let txt = 'CHANGAN — REVISIÓN DE COLOR\nGonzalo Arevalo · CGI/IA/Retoque\n';
+  txt += '='.repeat(50) + '\n\n';
+  const sorted = [...selected].sort((a,b) => {
+    const [ta,ia] = a.split('_'); const [tb,ib] = b.split('_');
+    if (ta !== tb) return ta.localeCompare(tb);
+    return parseInt(ia) - parseInt(ib);
+  });
+  let currentType = '';
+  sorted.forEach(key => {
+    const [type, idStr] = key.split('_');
+    const id = parseInt(idStr);
+    if (type !== currentType) {
+      txt += `\n── ${type} ──────────────────────────\n`;
+      currentType = type;
+    }
+    const saved = JSON.parse(localStorage.getItem(`review_${key}`) || '{}');
+    const status = saved.status ? saved.status.toUpperCase() : 'SIN ESTADO';
+    const comment = saved.comment || '(sin comentario)';
+    txt += `\nShot ${pad3(id)} [${status}]\n${comment}\n`;
+  });
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'changan_revision_color.txt';
+  a.click();
+}
+
+// LIGHTBOX
+function openLightbox(src, caption) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox-caption').textContent = caption;
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+document.getElementById('lightbox').addEventListener('click', function(e) {
+  if (e.target === this) closeLightbox();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+function scrollToSection(id) {
+  document.querySelector(id).scrollIntoView({behavior:'smooth'});
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#222;border:1px solid var(--gold-dim);color:var(--gold-light);padding:12px 24px;font-size:13px;letter-spacing:1px;border-radius:4px;z-index:300;transition:opacity 0.4s;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+</script>
+</body>
+</html>
