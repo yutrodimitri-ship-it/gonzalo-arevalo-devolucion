@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "name": "gonzalo-arevalo-devolucion",
+  "rewrites": [
+    { "source": "/", "destination": "/changan_color_report.html" }
+  ]
+}
