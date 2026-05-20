@@ -832,7 +832,8 @@ async function sendByEmail() {
         access_key: 'f044e769-84a8-43ac-adbb-a1a0051376aa',
         subject: 'Changan — Revisión de corrección de color',
         message: buildCommentText(),
-        from_name: 'Informe Changan'
+        from_name: 'Informe Changan',
+        cc: 'contacto@gonzaloarevalo.com'
       })
     });
     const data = await res.json();
