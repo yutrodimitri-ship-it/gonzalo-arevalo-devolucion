@@ -468,7 +468,8 @@
   </div>
   <div class="review-actions">
     <button class="btn-sm btn-outline" onclick="goToMain()">← Volver al informe</button>
-    <button class="btn-sm btn-gold" onclick="exportComments()">Exportar comentarios</button>
+    <button class="btn-sm btn-outline" onclick="exportComments()">Exportar como texto</button>
+    <button id="btn-send-email" class="btn-sm btn-gold" onclick="sendByEmail()">✉ Enviar por email</button>
   </div>
 </div>
 
@@ -481,7 +482,8 @@
 
 <div class="export-section">
   <button class="btn-sm btn-outline" onclick="clearAllComments()">Limpiar todos los comentarios</button>
-  <button class="btn-sm btn-gold" onclick="exportComments()">Exportar como texto</button>
+  <button class="btn-sm btn-outline" onclick="exportComments()">Exportar como texto</button>
+  <button id="btn-send-email" class="btn-sm btn-gold" onclick="sendByEmail()">✉ Enviar por email</button>
 </div>
 
 </div><!-- end page-review -->
@@ -785,6 +787,15 @@ function confirmClearAll() {
 }
 
 function exportComments() {
+  const txt = buildCommentText();
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'changan_revision_color.txt';
+  a.click();
+}
+
+function buildCommentText() {
   let txt = 'CHANGAN — REVISIÓN DE COLOR\nGonzalo Arevalo · CGI/IA/Retoque\n';
   txt += '='.repeat(50) + '\n\n';
   const sorted = [...selected].sort((a,b) => {
@@ -801,15 +812,54 @@ function exportComments() {
       currentType = type;
     }
     const saved = JSON.parse(localStorage.getItem(`review_${key}`) || '{}');
-    const status = saved.status ? saved.status.toUpperCase() : 'SIN ESTADO';
     const comment = saved.comment || '(sin comentario)';
-    txt += `\nShot ${pad3(id)} [${status}]\n${comment}\n`;
+    txt += `\nShot ${pad3(id)}\n${comment}\n`;
   });
-  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'changan_revision_color.txt';
-  a.click();
+  return txt;
+}
+
+async function sendByEmail() {
+  const btn = document.getElementById('btn-send-email');
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: 'f044e769-84a8-43ac-adbb-a1a0051376aa',
+        subject: 'Changan — Revisión de corrección de color',
+        message: buildCommentText(),
+        from_name: 'Informe Changan'
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      btn.textContent = '✓ Enviado';
+      btn.style.background = '#2e7d32';
+      btn.style.borderColor = '#2e7d32';
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.disabled = false;
+      }, 3000);
+    } else {
+      throw new Error(data.message || 'Error al enviar');
+    }
+  } catch (err) {
+    btn.textContent = '✗ Error al enviar';
+    btn.style.background = '#c62828';
+    btn.style.borderColor = '#c62828';
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.disabled = false;
+    }, 3000);
+  }
 }
 
 // LIGHTBOX
