@@ -584,9 +584,9 @@ function sortByTc(ids) {
   });
 }
 
-buildGrid(sortByTc(SHOTS.CARRETERA), 'grid-carretera', 'CARRETERA');
-buildGrid(sortByTc(SHOTS.CIUDAD),    'grid-ciudad',    'CIUDAD');
-buildGrid(sortByTc(SHOTS.INTERIOR),  'grid-interior',  'INTERIOR');
+buildGrid(SHOTS.CARRETERA, 'grid-carretera', 'CARRETERA');
+buildGrid(SHOTS.CIUDAD,    'grid-ciudad',    'CIUDAD');
+buildGrid(SHOTS.INTERIOR,  'grid-interior',  'INTERIOR');
 
 function toggleSelect(key, el) {
   if (selected.has(key)) {
